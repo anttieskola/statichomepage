@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <base href="/" />
+    <link href="css/bootstrap-5.1.2.min.css" rel="stylesheet" />
+    <!-- static app -->
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="Ui.styles.css" rel="stylesheet" />
+    <title>Loading...</title>
+</head>
+<body>
+    <div id="app">
+        <div class="container-sm mt-5">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 5%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            <script hidden="hidden" type="text/javascript">
+
+                // blazor loading progress (.net runtime and stuff)
+                // wifi 2 secs
+                var progress = 10;
+
+                function loadingLoop(progress) {
+                    setTimeout(function (progress) {
+                        var pb = document.getElementById('progressBar');
+                        if (pb != null) {
+                            // increment
+                            progress += 10;
+                            if (progress === 90) {
+                                progress = 99;
+                            }
+                            // set width
+                            pb.setAttribute('style', 'width: ' + progress + '%');
+                            // call me
+                            loadingLoop(progress);
+                        }
+                        // should die here
+                    }, 150, progress);
+                }
+
+                // silly animation which really doest not tell the progress
+                loadingLoop(progress);
+            </script>
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <article>
+                        <p>
+                            Loading web assembly, please wait for a moment...
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>
