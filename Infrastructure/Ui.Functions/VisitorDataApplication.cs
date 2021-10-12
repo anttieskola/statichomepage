@@ -1,34 +1,25 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Bogus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
-namespace Api
+namespace Ui.Functions
 {
-    public static class Bogus
+    public static class VisitorDataApplication
     {
-        public static readonly Faker _faker = new Faker();
-
-        [FunctionName("BogusGreetings")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "json/text", bodyType: typeof(string), Description = "The OK response")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "bogus/greetings")] HttpRequest req,
+        [FunctionName("VisitorDataApplication")]
+        public static async Task<IActionResult> Store(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "/api/visitordata/store")] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("bogus/hollywood");
+            log.LogTrace("VisitorDataApplication: /api/visitordata/store");
 
             
-
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();

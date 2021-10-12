@@ -1,0 +1,27 @@
+﻿@page "/"
+@using PresentationMediator
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Title</PageTitle>
+
+<div class="mx-auto">
+    <p>
+        Welcome
+        <span class="oi oi-heart" title="heart" aria-hidden="true"></span>
+    </p>
+
+    <p>
+        @_visitorData
+    </p>
+</div>
+
+@code {
+    private string _visitorData = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _visitorData = await JS.InvokeAsync<string>("GetVisitorData");
+        await base.OnInitializedAsync();
+    }
+}
