@@ -1,6 +1,4 @@
-﻿@page "/"
-@using PresentationMediator
-@inject HttpClient Http
+﻿@page "/{Param?}"
 @inject IJSRuntime JS
 
 <PageTitle>Title</PageTitle>
@@ -14,14 +12,72 @@
     <p>
         @_visitorData
     </p>
+
+    <p>@_message</p>
 </div>
 
 @code {
-    private string _visitorData = "Loading...";
+    #region Parameters - Lifecycle - 1
+    private string _message = "Not set";
 
+    [Parameter]
+    public string? Param { get; set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (parameters.TryGetValue<string>(nameof(Param), out var value))
+        {
+            if (value is null)
+            {
+                _message = "The value of 'Param' is null.";
+            }
+            else
+            {
+                _message = $"The value of 'Param' is {value}.";
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
+
+    #endregion Parameters - Lifecycle - 1
+
+    #region OnInitializedAsync - Lifecycle - 2
+
+    /// <summary>
+    /// Note can't use JS interropt
+    /// </summary>
+    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
-        _visitorData = await JS.InvokeAsync<string>("GetVisitorData");
         await base.OnInitializedAsync();
+    }
+
+    #endregion OnInitializedAsync - Lifecycle - 2
+
+
+
+    #region OnAfterRender - Lifecycle - 3
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _visitorData = await GetWindowNavigatorProperty("appCodeName");
+            StateHasChanged();
+        }
+    }
+    #endregion OnAfterRender - Lifecycle - 3
+
+    private string _visitorData = "Loading...";
+
+    /// <summary>
+    /// https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    public async Task<string> GetWindowNavigatorProperty(string property)
+    {
+        var result = await JS.InvokeAsync<string>("GetWindowNavigatorProperty", property);
+        return result;
     }
 }

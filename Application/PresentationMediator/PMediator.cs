@@ -2,6 +2,14 @@
 {
     public class PMediator : IMediator
     {
+        public PMediator()
+        {
+
+        }
+
+
+
+        #region IDisposable
         private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
@@ -21,5 +29,7 @@
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion IDisposable
     }
 }
