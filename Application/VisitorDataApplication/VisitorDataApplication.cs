@@ -1,6 +1,6 @@
 ﻿namespace VisitorDataApplication
 {
-    public class Class1
+    public class VisitorDataApplication
     {
 
     }

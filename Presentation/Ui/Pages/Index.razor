@@ -63,6 +63,7 @@
         if (firstRender)
         {
             _visitorData = await GetWindowNavigatorProperty("appCodeName");
+            RunVisitorData
             StateHasChanged();
         }
     }

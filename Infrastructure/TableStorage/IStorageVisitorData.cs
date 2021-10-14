@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TableStorage
+﻿namespace TableStorage
 {
     public interface IStorageVisitorData
     {
+        Task<NavigatorData> Store(NavigatorData data);
     }
 }
