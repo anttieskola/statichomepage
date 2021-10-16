@@ -10,4 +10,4 @@ provide bootstrap and open iconic.
 2. Add after platform import into index.html head section
 ``<link href="_content/Ui.Components/css/components.css" rel="stylesheet">``
 3. Add into the body after blazor.webassembly.js
-``<script src="_content/Ui.Components/js/components.js"></script>``
+``<script type="module" src="_content/Ui.Components/js/components.js"></script>``

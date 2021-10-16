@@ -1,1 +1,2 @@
-﻿import * as VisitorData from "VisitorData.js";
+﻿import { GetWindowNavigatorProperty } from './modules/VisitorData.js';
+export { }
