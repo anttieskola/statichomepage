@@ -1,0 +1,59 @@
+﻿@inject IJSRuntime JS
+@using PresentationModels.VisitorDataApplication
+@using System.Text.Json
+
+@if (ShowProgress)
+{
+    <div class="card">
+        <div class="card-body">
+            @_progressString
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public bool ShowProgress { get; set; } = false;
+
+    [Parameter]
+    public string QueryString { get; set; } = null;
+
+    private string _progressString = string.Empty;
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GatherNavigatorProperties();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task GatherNavigatorProperties()
+    {
+        var navigatorProperties = new NavigatorProperties
+        {
+            AppCodeName = await GetWindowNavigatorProperty("appCodeName"),
+            AppName = await GetWindowNavigatorProperty("appName"),
+            AppVersion = await GetWindowNavigatorProperty("appVersion"),
+            Platform = await GetWindowNavigatorProperty("platform"),
+            Product = await GetWindowNavigatorProperty("product"),
+        };
+
+        _progressString = JsonSerializer.Serialize(navigatorProperties);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    private async Task<string> GetWindowNavigatorProperty(string property)
+    {
+        var response = await JS.InvokeAsync<string>("GetWindowNavigatorProperty", property);
+        return response;
+    }
+}

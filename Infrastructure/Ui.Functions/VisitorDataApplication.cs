@@ -18,9 +18,7 @@ namespace Ui.Functions
             ILogger log)
         {
             log.LogTrace("VisitorDataApplication: /api/visitordata/store");
-
-
-                        
+            // TODO
             return new OkResult();
         }
     }

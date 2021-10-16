@@ -1,7 +1,17 @@
-﻿namespace VisitorDataApplication
+﻿using PresentationModels.VisitorDataApplication;
+
+namespace VisitorDataApplication;
+
+public class VisitorDataApplication : IVisitorDataApplication
 {
-    public class VisitorDataApplication
+    public VisitorDataApplication()
     {
 
+    }
+
+
+    public Task<NavigatorProperties> Store(NavigatorProperties navigationProperties)
+    {
+        throw new NotImplementedException();
     }
 }

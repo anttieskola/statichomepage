@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Data.Tables;
+﻿using Azure.Data.Tables;
 using Configuration;
 using Microsoft.Extensions.Logging;
+using PresentationModels.VisitorDataApplication;
 
 namespace TableStorage
 {
@@ -20,19 +15,15 @@ namespace TableStorage
             IConfigurationClient configurationClient)
         {
             _logger = logger;
+            _client = new TableClient(new Uri(configurationClient.GetValue("TableStorage:Uri")));
 
-
-            var options = new TableClientOptions
-            {
-            };
-
-            _client = new TableClient(new Uri(configurationClient.GetValue("TableStorage:Uri"), options);
         }
 
-
-        public Task<NavigatorData> Store(NavigatorData data)
+        public Task<NavigatorProperties> Store(NavigatorProperties data)
         {
+            throw new NotImplementedException();
         }
+
 
         #region IDisposable
         private bool _disposedValue;
@@ -66,6 +57,6 @@ namespace TableStorage
             GC.SuppressFinalize(this);
 
         }
-
         #endregion IDisposable
     }
+}

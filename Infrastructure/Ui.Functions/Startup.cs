@@ -17,7 +17,6 @@ namespace Ui.Functions
                 configure.AddApplicationInsights("");
             });
             builder.Services.AddScoped<IConfigurationClient, ConfigurationClient>();
-            builder.Services.
         }
     }
 }

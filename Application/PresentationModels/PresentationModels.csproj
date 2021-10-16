@@ -10,8 +10,4 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-rc.2.21480.5" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="GreetingsApplication\" />
-  </ItemGroup>
-
 </Project>

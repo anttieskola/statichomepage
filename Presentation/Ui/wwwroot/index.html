@@ -1,19 +1,28 @@
 <!doctype html>
-<html lang="en" cha>
+<html lang="en">
 <head>
     <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS -->
-    <base href="/" />
-    <link href="css/bootstrap-5.1.2.min.css" rel="stylesheet" />
-    <!-- static app -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Ui.Platform -->
+    <link href="_content/Ui.Platform/css/platform.css" rel="stylesheet" />
+    
+    <!-- Ui.Components -->
+    <link href="_content/Ui.Components/css/components.css" rel="stylesheet" />
+
+    <!-- Ui -->
     <link href="css/app.css" rel="stylesheet" />
     <link href="Ui.styles.css" rel="stylesheet" />
     <title>Loading...</title>
+
 </head>
 <body>
+
+    <!-- Blazor application element -->
     <div id="app">
+
+        <!-- Made silly loading bar that just looks cool -->
         <div class="container-sm mt-5">
             <div class="row">
                 <div class="col-10 offset-1">
@@ -53,19 +62,27 @@
                 <div class="col-10 offset-1">
                     <article>
                         <p>
-                            Loading web assembly, please wait for a moment...
+                            Loading application, please wait for a moment...
                         </p>
                     </article>
                 </div>
             </div>
         </div>
+
     </div>
+
+    <!-- Blazor error element-->
     <div id="blazor-error-ui">
         An unhandled error has occurred.
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
+    <!-- Blazor application -->
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="js/Index.js"></script>
+
+    <!-- Ui.Components JSInteropt scripts -->
+    <script src="_content/Ui.Components/js/components.js"></script>
+
 </body>
 </html>

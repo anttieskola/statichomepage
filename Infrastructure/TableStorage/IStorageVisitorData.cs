@@ -1,7 +1,9 @@
-﻿namespace TableStorage
+﻿using PresentationModels.VisitorDataApplication;
+
+namespace TableStorage
 {
     public interface IStorageVisitorData
     {
-        Task<NavigatorData> Store(NavigatorData data);
+        Task<NavigatorProperties> Store(NavigatorProperties data);
     }
 }
