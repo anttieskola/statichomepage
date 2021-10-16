@@ -21,7 +21,6 @@
 
     private string _progressString = string.Empty;
 
-
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -72,4 +71,10 @@
         var response = await JS.InvokeAsync<TReturnType>("GetWindowNavigatorProperty", property);
         return response;
     }
+
+    // Refactor
+    // Load the module and keep a reference to it
+    // You need to use .AsTask() to convert the ValueTask to Task as it may be awaited multiple times
+    private Task<IJSObjectReference> _module;
+    private Task<IJSObjectReference> Module => _module ??= JS.InvokeAsync<IJSObjectReference>("import", "./js/VisitorData.js").AsTask();
 }
