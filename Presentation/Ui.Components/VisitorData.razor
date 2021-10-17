@@ -1,80 +1,12 @@
-﻿@inject IJSRuntime JS
-@using PresentationModels.VisitorDataApplication
-@using System.Text.Json
-
+﻿@inherits VisitorDataCode
 @if (ShowProgress)
 {
     <div class="card">
         <div class="card-body">
-            @_progressString
+            @ProgressString
         </div>
     </div>
 }
+@code{
 
-@code {
-
-    [Parameter]
-    public bool ShowProgress { get; set; } = false;
-
-    [Parameter]
-    public string? QueryString { get; set; } = null;
-
-    private string _progressString = string.Empty;
-
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await GatherNavigatorProperties();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private async Task GatherNavigatorProperties()
-    {
-        var appCodeName = await GetWindowNavigatorProperty<string>("appCodeName");
-        var appName = await GetWindowNavigatorProperty<string>("appName");
-        var appVersion = await GetWindowNavigatorProperty<string>("appVersion");
-        var platform = await GetWindowNavigatorProperty<string>("platform");
-        var product = await GetWindowNavigatorProperty<string>("product");
-        var productSub = await GetWindowNavigatorProperty<string>("productSub");
-        var userAgent = await GetWindowNavigatorProperty<string>("userAgent");
-        var vendor = await GetWindowNavigatorProperty<string>("vendor");
-        var vendorSub = await GetWindowNavigatorProperty<string>("vendorSub");
-        var language = await GetWindowNavigatorProperty<string>("language");
-        var languages = await GetWindowNavigatorProperty<string[]>("languages");
-
-        var navigatorProperties = new NavigatorProperties(
-            appCodeName,
-            appName,
-            appVersion,
-            platform,
-            product,
-            productSub,
-            userAgent, 
-            vendor, 
-            vendorSub, 
-            language,
-            languages);
-
-        _progressString = JsonSerializer.Serialize(navigatorProperties);
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator
-    /// </summary>
-    /// <param name="property"></param>
-    /// <returns></returns>
-    private async Task<TReturnType> GetWindowNavigatorProperty<TReturnType>(string property)
-    {
-        var response = await JS.InvokeAsync<TReturnType>("GetWindowNavigatorProperty", property);
-        return response;
-    }
-
-    // Refactor
-    // Load the module and keep a reference to it
-    // You need to use .AsTask() to convert the ValueTask to Task as it may be awaited multiple times
-    private Task<IJSObjectReference> _module;
-    private Task<IJSObjectReference> Module => _module ??= JS.InvokeAsync<IJSObjectReference>("import", "./js/VisitorData.js").AsTask();
 }

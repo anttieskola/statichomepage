@@ -39,7 +39,101 @@ Azure portal.
 2. OnInitialized
 3. OnAfterRender(bool firstRender)
 
+## Component lifecycle from source (code behind)
+// Summary:
+//     Method invoked when the component has received parameters from its parent in
+//     the render tree, and the incoming values have been assigned to properties.
+//
+// Returns:
+//     A System.Threading.Tasks.Task representing any asynchronous operation.
+protected virtual Task OnParametersSetAsync()
+
+// Summary:
+//     Method invoked when the component is ready to start, having received its initial
+//     parameters from its parent in the render tree.
+protected virtual void OnInitialized()
+
+// Summary:
+//     Method invoked when the component is ready to start, having received its initial
+//     parameters from its parent in the render tree. Override this method if you will
+//     perform an asynchronous operation and want the component to refresh when that
+//     operation is completed.
+//
+// Returns:
+//     A System.Threading.Tasks.Task representing any asynchronous operation.
+protected virtual Task OnInitializedAsync()
+
+// Summary:
+//     Method invoked after each time the component has been rendered.
+//
+// Parameters:
+//   firstRender:
+//     Set to true if this is the first time Microsoft.AspNetCore.Components.ComponentBase.OnAfterRender(System.Boolean)
+//     has been invoked on this component instance; otherwise false.
+//
+// Remarks:
+//     The Microsoft.AspNetCore.Components.ComponentBase.OnAfterRender(System.Boolean)
+//     and Microsoft.AspNetCore.Components.ComponentBase.OnAfterRenderAsync(System.Boolean)
+//     lifecycle methods are useful for performing interop, or interacting with values
+//     received from @ref. Use the firstRender parameter to ensure that initialization
+//     work is only performed once.
+protected virtual void OnAfterRender(bool firstRender)
+
+// Summary:
+//     Method invoked after each time the component has been rendered. Note that the
+//     component does not automatically re-render after the completion of any returned
+//     System.Threading.Tasks.Task, because that would cause an infinite render loop.
+//
+// Parameters:
+//   firstRender:
+//     Set to true if this is the first time Microsoft.AspNetCore.Components.ComponentBase.OnAfterRender(System.Boolean)
+//     has been invoked on this component instance; otherwise false.
+//
+// Returns:
+//     A System.Threading.Tasks.Task representing any asynchronous operation.
+//
+// Remarks:
+//     The Microsoft.AspNetCore.Components.ComponentBase.OnAfterRender(System.Boolean)
+//     and Microsoft.AspNetCore.Components.ComponentBase.OnAfterRenderAsync(System.Boolean)
+//     lifecycle methods are useful for performing interop, or interacting with values
+//     received from @ref. Use the firstRender parameter to ensure that initialization
+//     work is only performed once.
+protected virtual Task OnAfterRenderAsync(bool firstRender)
+
 ## IDisposable
 Blazor components can implement IDisposable to dispose of resources when the component
 is removed from the UI. A Razor component can implement IDispose by using the @implements
 directive. (@implements IDisposable)
+
+## IAsyncDisposable
+
+## JSInteropt
+- docs: https://docs.microsoft.com/en-us/aspnet/core/blazor/javascript-interoperability/call-javascript-from-dotnet?view=aspnetcore-5.0#blazor-javascript-isolation-and-object-references
+- Basic way is to include the script after the app in the index.html page
+  but then it would require always to update the index if even tho
+  you most likely will write code in component library or elsewhere.
+
+- Advanced way is to load it dynamically. This way must create either
+  a module or an object that you dynamically load.
+
+### JSInteropt - Basic way
+- IJSRuntime is the normal interface, where you call some function that
+  exists. You can call like standard functions directly like for example:
+  ``await JS.InvokeVoidAsync("console.log", "hello console");``
+  or another example:
+  ``await JS.InvokeVoidAsync("alert", "hello alert");``
+  
+- Note, that if function returns value that must be known and defined.
+
+**Maybe the only annyoing thing in this is that it must be a function that we call**
+I did try to execute a lambda to get a property from an object, but it won't work...
+
+### JSInteropt - Advanced way
+- IJSObjectReference is the advanced interface what you can use to dynamically
+  load reference to an Javascript object. Then call it's method and such.
+  Example loading:
+  ``var module = await JS.InvokeAsync("import", "pathToJavascriptObject")``
+  Example invoking:
+  ``module
+
+  JS Module documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules

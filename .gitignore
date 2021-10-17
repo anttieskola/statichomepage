@@ -1,5 +1,5 @@
 # Customisation because TypeScript
-**/wwwroot/js/*
+# **/wwwroot/js/*
 
 # User-specific files
 *.suo
