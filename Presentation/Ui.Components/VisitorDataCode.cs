@@ -73,7 +73,7 @@ namespace Ui.Components
         }
 
         /// <summary>
-        /// // https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator
+        /// https://html.spec.whatwg.org/multipage/system-state.html#dom-navigator
         /// </summary>
         /// <returns></returns>
         private async Task GatherNavigatorProperties()
@@ -109,21 +109,20 @@ namespace Ui.Components
                 language,
                 languages);
 
-            ProgressString = JsonSerializer.Serialize(navigatorProperties);
+            ProgressString = JsonSerializer.Serialize(navigatorProperties, new JsonSerializerOptions { WriteIndented = true,});
             base.StateHasChanged();
+
         }
 
 
-        #region IDisposable
+        #region IAsyncDisposable
         public async ValueTask DisposeAsync()
         {
             // Perform async cleanup.
             await DisposeAsyncCore();
 
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
             // Suppress finalization.
             GC.SuppressFinalize(this);
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
         }
 
         protected virtual async ValueTask DisposeAsyncCore()

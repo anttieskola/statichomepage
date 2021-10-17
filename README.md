@@ -128,12 +128,13 @@ directive. (@implements IDisposable)
 **Maybe the only annyoing thing in this is that it must be a function that we call**
 I did try to execute a lambda to get a property from an object, but it won't work...
 
-### JSInteropt - Advanced way
+### JSInteropt - Advanced way (JS Isolation)
 - IJSObjectReference is the advanced interface what you can use to dynamically
   load reference to an Javascript object. Then call it's method and such.
   Example loading:
   ``var module = await JS.InvokeAsync("import", "pathToJavascriptObject")``
   Example invoking:
-  ``module
 
+  From testing seems to work to export objects or functions.
+  
   JS Module documentation: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
