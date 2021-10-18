@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using PresentationModels.VisitorDataApplication;
@@ -7,6 +8,13 @@ namespace Ui.Components
 {
     public class VisitorDataCode : ComponentBase, IAsyncDisposable
     {
+        private enum Step
+        {
+            Initial = 1,
+            NavigatorProps = 2,
+            Saved = 3,
+        }
+
         [Parameter]
         public bool ShowProgress { get; set; } = false;
 
@@ -14,11 +22,19 @@ namespace Ui.Components
         public string? QueryString { get; set; } = null;
 
         [Inject]
-        IJSRuntime JS { get; set; } = default!;
+        private IJSRuntime JS { get; set; } = default!;
+
+        [Inject]
+        private HttpClient HttpClient { get; set; } = default!;
 
         public string ProgressString { get; set; } = "Loading...";
 
+        private NavigatorProperties _navigatorProps = default!;
+
         private Task<IJSObjectReference> _jsLoadingTask = default!;
+
+        private Step _step = Step.Initial;
+
 
         /// <summary>
         /// Method invoked when the component has received parameters from its parent in
@@ -69,6 +85,18 @@ namespace Ui.Components
             {
                 await GatherNavigatorProperties();
             }
+            else
+            {
+                if (_step == Step.NavigatorProps)
+                {
+                    var response = await HttpClient.PostAsJsonAsync("api/visitordata/navigatorproperties", _navigatorProps);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        ProgressString = "Has been saved. Thank you stranger.";
+                    }
+                    _step = Step.Saved;
+                }
+            }
             await base.OnAfterRenderAsync(firstRender);
         }
 
@@ -96,7 +124,7 @@ namespace Ui.Components
             var language = await module.InvokeAsync<string>("getNavigatorProperty", "language");
             var languages = await module.InvokeAsync<string[]>("getNavigatorProperty", "languages");
 
-            var navigatorProperties = new NavigatorProperties(
+            _navigatorProps = new NavigatorProperties(
                 appCodeName,
                 appName,
                 appVersion,
@@ -109,19 +137,23 @@ namespace Ui.Components
                 language,
                 languages);
 
-            ProgressString = JsonSerializer.Serialize(navigatorProperties, new JsonSerializerOptions { WriteIndented = true,});
-            base.StateHasChanged();
+            ProgressString = JsonSerializer.Serialize(_navigatorProps, new JsonSerializerOptions { WriteIndented = true});
+            StateHasChanged();
 
+            // testing some stuff out
+            _ = Task.Run(() =>
+              {
+                  Task.Delay(TimeSpan.FromSeconds(3));
+                  _step = Step.NavigatorProps;
+                  StateHasChanged();
+              });
         }
 
 
         #region IAsyncDisposable
         public async ValueTask DisposeAsync()
         {
-            // Perform async cleanup.
             await DisposeAsyncCore();
-
-            // Suppress finalization.
             GC.SuppressFinalize(this);
         }
 
@@ -135,7 +167,6 @@ namespace Ui.Components
             {
                 await _jsLoadingTask.Result.DisposeAsync();
             }
-
             _jsLoadingTask = default!;
         }
         #endregion

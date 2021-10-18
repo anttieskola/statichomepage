@@ -8,22 +8,45 @@ namespace TableStorage
     public class TableStorageVisitorData : IStorageVisitorData, IDisposable
     {
         private readonly ILogger<TableStorageVisitorData> _logger;
-        private readonly TableClient _client;
+        private readonly IConfigurationClient _configurationClient;
+        private readonly TableClient _clientNavigatorProps;
 
         public TableStorageVisitorData(
             ILogger<TableStorageVisitorData> logger,
             IConfigurationClient configurationClient)
         {
             _logger = logger;
-            _client = new TableClient(new Uri(configurationClient.GetValue("TableStorage:Uri")));
-
+            _configurationClient = configurationClient;
         }
 
-        public Task<NavigatorProperties> Store(NavigatorProperties data)
+        public async Task<NavigatorProperties> Store(NavigatorProperties data)
         {
-            throw new NotImplementedException();
+            _logger.LogTrace("TableStorageVisitorData: Store");
+
+            await AddEntitiesAsync<NavigatorProperties>("NavigatorProperties", data);
         }
 
+
+        private async Task AddEntitiesAsync<T>(string tableName, T tableEntity) where T : class, ITableEntity, new()
+        {
+            try
+            {
+                var TableClient = CreateaAuthenticatedTableClient(tableName);
+                await TableClient.AddEntityAsync(tableEntity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+        }
+
+        private TableClient CreateaAuthenticatedTableClient(string tableName)
+        {
+            var uri = _configurationClient.GetValue("TableStorage-Uri");
+            uri += tableName;
+            uri += _configurationClient.GetValue("TableStorage-Sas");
+            return new TableClient(new Uri(uri));
+        }
 
         #region IDisposable
         private bool _disposedValue;
