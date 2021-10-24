@@ -1,74 +1,51 @@
 ﻿@page "/{Params?}"
-@inject IJSRuntime JS
 
-<PageTitle>Welcome</PageTitle>
+<PageTitle>Notice</PageTitle>
 
-<div class="mx-auto">
-    <p>Hello stranger.</p>
+<div class="container-sm mx-auto">
+    <div class="card" style="width: 200px;">
+        <div class="card-body">
+        <h5 class="card-title">About cookies</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+            This site does not use any cookies.
+        </h6>
+        <p class="card-text">
+            <Whoami ErrorPage="/Hamster" />
+        </p>
+        <a href="@OkLink" class="btn btn-primary">Ok</a>
+        </div>
+    </div>
 </div>
 
-<VisitorData ShowProgress=true QueryString=Params />
-
-
 @code {
-    #region Parameters - Lifecycle - 1
-    private string _message = "Not set";
-
     [Parameter]
     public string? Params { get; set; }
 
-    /// <summary>
-    /// Lifecycle - part 1
-    /// </summary>
-    /// <param name="parameters"></param>
-    /// <returns></returns>
+    public string OkLink { get; set; } = "/welcome";
+
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.TryGetValue<string>(nameof(Params), out var value))
-        {
-            if (value is null)
-            {
-                _message = "The value of 'Params' is null.";
-            }
-            else
-            {
-                _message = $"The value of 'Params' is {value}.";
-            }
-        }
-
         await base.SetParametersAsync(parameters);
     }
 
-    #endregion Parameters - Lifecycle - 1
-
-    #region OnInitializedAsync - Lifecycle - 2
-
-    /// <summary>
-    /// Lifecycle - part 2
-    /// Note to self can't use JS interropt
-    /// </summary>
-    /// <returns></returns>
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
     }
-
-    #endregion OnInitializedAsync - Lifecycle - 2
-
-
-
-    #region OnAfterRender - Lifecycle - 3
-    /// <summary>
-    /// Lifecycle - part 3    
-    /// </summary>
-    /// <param name="firstRender"></param>
-    /// <returns></returns>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Do something and call StateHasChanged()
-        }     
+            if (Params != null)
+            {
+                OkLink = $"/welcome/{Params}";
+            }
+            else
+            {
+                OkLink = $"/welcome/";
+            }
+            StateHasChanged();
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
-    #endregion OnAfterRender - Lifecycle - 3
 }

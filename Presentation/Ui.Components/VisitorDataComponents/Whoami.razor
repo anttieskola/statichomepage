@@ -1,0 +1,24 @@
+﻿@inject HttpClient httpClient
+@inject NavigationManager manager
+<p>
+    Welcome, @(_message ?? string.Empty)
+</p>
+
+@code {
+
+    [Parameter] public string? ErrorPage { get; set; }
+
+    VisitorData? _visitorData;
+
+    private string? _message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _visitorData = await httpClient.GetFromJsonAsync<VisitorData>("api/visitordata/whoami");
+        if (_visitorData == null)
+        {
+             manager.NavigateTo(ErrorPage ?? "/Hamster", true);
+        }
+        await base.OnInitializedAsync();
+    }
+}

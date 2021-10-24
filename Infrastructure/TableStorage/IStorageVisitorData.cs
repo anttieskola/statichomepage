@@ -4,6 +4,7 @@ namespace TableStorage
 {
     public interface IStorageVisitorData
     {
-        Task<NavigatorProperties> Store(NavigatorProperties data);
+        Task<bool> Store(VisitorProperties data);
+        Task<VisitorData> QueryData(VisitorProperties data);
     }
 }

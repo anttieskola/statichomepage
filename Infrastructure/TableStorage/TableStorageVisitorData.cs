@@ -1,7 +1,9 @@
-﻿using Azure.Data.Tables;
+﻿using Azure;
+using Azure.Data.Tables;
 using Configuration;
 using Microsoft.Extensions.Logging;
 using PresentationModels.VisitorDataApplication;
+using TableStorage.Entities;
 
 namespace TableStorage
 {
@@ -9,7 +11,6 @@ namespace TableStorage
     {
         private readonly ILogger<TableStorageVisitorData> _logger;
         private readonly IConfigurationClient _configurationClient;
-        private readonly TableClient _clientNavigatorProps;
 
         public TableStorageVisitorData(
             ILogger<TableStorageVisitorData> logger,
@@ -19,36 +20,74 @@ namespace TableStorage
             _configurationClient = configurationClient;
         }
 
-        public async Task<NavigatorProperties> Store(NavigatorProperties data)
+        public async Task<bool> Store(VisitorProperties visitorProperties)
         {
-            _logger.LogTrace("TableStorageVisitorData: Store");
-
-            await AddEntitiesAsync<NavigatorProperties>("NavigatorProperties", data);
+            var entity = new VisitorPropertiesEntity(visitorProperties);
+            var result = await AddEntitiesAsync<VisitorPropertiesEntity>(entity);
+            return result;
         }
 
+        private async Task<bool> AddEntitiesAsync<T>(T tableEntity) where T : class, ITableEntity, new()
+        {
+            _logger.LogTrace($"AddEntitiesAsync<{typeof(T)}>)");
 
-        private async Task AddEntitiesAsync<T>(string tableName, T tableEntity) where T : class, ITableEntity, new()
+            try
+            {
+                var tableClient = CreateTableClient(Constants.TableName(tableEntity));
+                var az = await tableClient.AddEntityAsync(tableEntity);
+                return az.Status >= 200 && az.Status < 300;
+            }
+            catch (RequestFailedException ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            return false;
+        }
+
+        public async Task<VisitorData> QueryData(VisitorProperties data)
         {
             try
             {
-                var TableClient = CreateaAuthenticatedTableClient(tableName);
-                await TableClient.AddEntityAsync(tableEntity);
+                var tableClient = CreateTableClient(Constants.TableName(data));
+                var results = tableClient.QueryAsync<VisitorPropertiesEntity>($"PartitionKey eq '{data.IpAddress}:{data.Port}'", 10).AsPages();
+
+                // TODO
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
             }
         }
-
-        private TableClient CreateaAuthenticatedTableClient(string tableName)
+        private async Task<bool> UpdateEntitiesAsync<T>(string tableName, T tableEntity) where T : class, ITableEntity, new()
         {
+            _logger.LogTrace($"UpdateEntitiesAsync<{typeof(T)}>({tableName})");
+
+            try
+            {
+                var tableClient = CreateTableClient(tableName);
+                var az = await tableClient.AddEntityAsync(tableEntity);
+                return az.Status == 1;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
+            return false;
+        }
+
+        private TableClient CreateTableClient(string tableName)
+        {
+#if DEBUG
+            return new TableClient(_configurationClient.GetValue("TableStorage-Emulator"), tableName);
+#else
             var uri = _configurationClient.GetValue("TableStorage-Uri");
             uri += tableName;
             uri += _configurationClient.GetValue("TableStorage-Sas");
             return new TableClient(new Uri(uri));
+#endif
         }
 
-        #region IDisposable
+#region IDisposable
         private bool _disposedValue;
 
         protected virtual void Dispose(bool disposing)
@@ -80,6 +119,7 @@ namespace TableStorage
             GC.SuppressFinalize(this);
 
         }
-        #endregion IDisposable
+
+#endregion IDisposable
     }
 }

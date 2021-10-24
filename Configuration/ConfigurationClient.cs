@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Azure;
 using Azure.Core;
 using Azure.Identity;
@@ -7,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Configuration
 {
+    /// <summary>
+    /// ConfigurationClient using Azure KeyVault secrets
+    /// </summary>
     public class ConfigurationClient : IConfigurationClient
     {
         private readonly ILogger<ConfigurationClient> _logger;
@@ -21,9 +25,9 @@ namespace Configuration
             {
                 Retry =
                 {
-                    Delay= TimeSpan.FromSeconds(2),
-                    MaxDelay = TimeSpan.FromSeconds(15),
-                    MaxRetries = 1,
+                    Delay= TimeSpan.FromSeconds(1),
+                    MaxDelay = TimeSpan.FromSeconds(2),
+                    MaxRetries = 2,
                     Mode = RetryMode.Fixed
                  }
             };
@@ -39,16 +43,26 @@ namespace Configuration
                 throw new ArgumentException(nameof(name));
             }
 
+            var cts = new CancellationTokenSource();
+
             try
             {
-                KeyVaultSecret secret = _client.GetSecret(name, null);
-                _logger.LogTrace("secret retrieved successfully"); 
+                // Max timeout
+                cts.CancelAfter(TimeSpan.FromSeconds(30));
+                KeyVaultSecret secret = _client.GetSecret(name, null, cts.Token);
+
+                _logger.LogTrace("secret get ok"); 
                 return secret.Value;
             }
             catch (RequestFailedException exception)
             {
-                _logger.LogError("keyvault get failed", exception);
+                _logger.LogError("secret get failed", exception);
                 throw;
+            }
+            finally
+            {
+                _logger.LogError("secret get was timeouted");
+                cts.Dispose();
             }
         }
     }

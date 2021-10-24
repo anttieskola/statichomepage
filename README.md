@@ -20,9 +20,42 @@ the differencies between just a web assembly vs core hosted.
 
 ## Presentation
 
+### Ui.Platform
+Project containing all javascript and style libraries
+used in the front end.
+
+### UI.Components
+Project to contain applications UI-components as a separate
+library so it could be reused in the future. This depends
+on the platform library
+
+### Ui
+The actual Blazor web assembly application. This contains
+the sites pages and components that are specific to this
+experiment.
+
 ## Application
 
+### XApplication
+
+### PresentationModels
+Library of the public models used in the application.
+This is referenced the mostly by all components
+in the application. Here I wanted to try out
+C# 9.0 record type.
+
 ## Infrastructure
+
+### Configuration
+All configuration in the application comes by using this
+component to retrieve data from Azure Keyvault.
+
+### TableStorage
+I wanted to try out using table storage for data instead
+like always using a real SQL or NOSQL database.
+
+### Functions
+Static websites backend functions.
 
 # Deployment
 Application is deployed using Github action. This will

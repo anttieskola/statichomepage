@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ui.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "host start --port 30000 --cors https://localhost:30001"
+    }
+  }
+}
