@@ -52,10 +52,12 @@ namespace TableStorage
                 var results = tableClient.QueryAsync<VisitorPropertiesEntity>($"PartitionKey eq '{data.IpAddress}:{data.Port}'", 10).AsPages();
 
                 // TODO
+                throw new NotImplementedException();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+                throw;
             }
         }
         private async Task<bool> UpdateEntitiesAsync<T>(string tableName, T tableEntity) where T : class, ITableEntity, new()
